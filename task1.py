@@ -3,6 +3,7 @@ Please do NOT make any changes to this file.
 '''
 
 from face import detect_faces
+from face import *
 import argparse
 import json
 import os
@@ -90,6 +91,9 @@ def main():
     os.makedirs(path, exist_ok=True)
     result_list = batch_detection(args.input_path)
     save_results(result_list, args.output)
+    
+    visualize_predictions('result_task1_val.json', 'validation_folder/images', 'debug_folder')
+    # visualize_ground_truth('validation_folder/ground-truth.json', 'validation_folder/images', 'debug_validation')
 
 if __name__ == "__main__":
     main()
