@@ -78,8 +78,25 @@ def cluster_faces(imgs: Dict[str, torch.Tensor], K: int) -> List[List[str]]:
     
     """
     cluster_results: List[List[str]] = [[] for _ in range(K)] # Please make sure your output follows this data format.
+    
+    file_names = []
+    fea_list = []
+    
+    for name, img in imgs.items():
+        if img.shape[0] != 3:
+            raise IndexError
+        file_names.append(name)
         
-    ##### YOUR IMPLEMENTATION STARTS HERE #####
+        # extract features
+        img = img.permute(1, 2, 0)
+        img_np = img.numpy().astype('uint8')
+        locs = face_recognition.face_locations(img_np)
+        # 128 demension
+        encodings = face_recognition.face_encodings(img_np, locs)
+        fea = torch.tensor(encodings[0], dtype=torch.float32)
+        fea_list.append(fea)
+    
+        
     
     return cluster_results
 
@@ -90,61 +107,61 @@ But remember the above 2 functions are the only functions that will be called by
 '''
 
 # TODO: Your functions. (if needed)
-import json
-import os
-from PIL import Image, ImageDraw
+# import json
+# import os
+# from PIL import Image, ImageDraw
 
-def visualize_predictions(json_path, img_dir, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
+# def visualize_predictions(json_path, img_dir, output_dir):
+#     os.makedirs(output_dir, exist_ok=True)
     
-    with open(json_path, 'r') as f:
-        results = json.load(f)
+#     with open(json_path, 'r') as f:
+#         results = json.load(f)
 
-    for img_name, bboxes in results.items():
-        img_path = os.path.join(img_dir, img_name)
-        if not os.path.exists(img_path):
-            continue
+#     for img_name, bboxes in results.items():
+#         img_path = os.path.join(img_dir, img_name)
+#         if not os.path.exists(img_path):
+#             continue
             
-        img = Image.open(img_path).convert('RGB')
-        draw = ImageDraw.Draw(img)
+#         img = Image.open(img_path).convert('RGB')
+#         draw = ImageDraw.Draw(img)
         
-        for bbox in bboxes:
-            x, y, w, h = bbox
-            draw.rectangle([x, y, x + w, y + h], outline="gray", width=3)
+#         for bbox in bboxes:
+#             x, y, w, h = bbox
+#             draw.rectangle([x, y, x + w, y + h], outline="gray", width=3)
             
-        img.save(os.path.join(output_dir, img_name))
-    print(f"saved to: {output_dir}")
+#         img.save(os.path.join(output_dir, img_name))
+#     print(f"saved to: {output_dir}")
 
 # visualize_predictions('result_task1_val.json', 'validation_folder/images', 'debug_folder')
 
-import json
-import os
-from PIL import Image, ImageDraw
-from collections import defaultdict
+# import json
+# import os
+# from PIL import Image, ImageDraw
+# from collections import defaultdict
 
-def visualize_ground_truth(gt_json_path, img_dir, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
+# def visualize_ground_truth(gt_json_path, img_dir, output_dir):
+#     os.makedirs(output_dir, exist_ok=True)
     
-    with open(gt_json_path, 'r') as f:
-        gt_data = json.load(f)
+#     with open(gt_json_path, 'r') as f:
+#         gt_data = json.load(f)
     
-    gt_dict = defaultdict(list)
-    for item in gt_data:
-        gt_dict[item['iname']].append(item['bbox'])
+#     gt_dict = defaultdict(list)
+#     for item in gt_data:
+#         gt_dict[item['iname']].append(item['bbox'])
 
-    for img_name, bboxes in gt_dict.items():
-        img_path = os.path.join(img_dir, img_name)
-        if not os.path.exists(img_path):
-            continue
+#     for img_name, bboxes in gt_dict.items():
+#         img_path = os.path.join(img_dir, img_name)
+#         if not os.path.exists(img_path):
+#             continue
             
-        img = Image.open(img_path).convert('RGB')
-        draw = ImageDraw.Draw(img)
+#         img = Image.open(img_path).convert('RGB')
+#         draw = ImageDraw.Draw(img)
         
-        for bbox in bboxes:
-            x, y, w, h = bbox
-            draw.rectangle([x, y, x + w, y + h], outline="red", width=3)
+#         for bbox in bboxes:
+#             x, y, w, h = bbox
+#             draw.rectangle([x, y, x + w, y + h], outline="red", width=3)
             
-        img.save(os.path.join(output_dir, img_name))
-    print(f"saved to: {output_dir}")
+#         img.save(os.path.join(output_dir, img_name))
+#     print(f"saved to: {output_dir}")
 
 # visualize_ground_truth('validation_folder/ground-truth.json', 'validation_folder/images', 'debug_validation')
