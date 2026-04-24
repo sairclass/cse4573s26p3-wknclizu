@@ -13,7 +13,7 @@ Please first update below and push your change to this repo.
 For the environment, you can use the project 2 setting and install face_recognition. Or use your own, there are no hard requirement about pytorch version.
 
 - Zhuoran Li 
-- Zli263
+- zli263
 
 **task 1 validation set**
 

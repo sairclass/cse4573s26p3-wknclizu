@@ -96,7 +96,29 @@ def cluster_faces(imgs: Dict[str, torch.Tensor], K: int) -> List[List[str]]:
         fea = torch.tensor(encodings[0], dtype=torch.float32)
         fea_list.append(fea)
     
+    # [num, 128]
+    fea_torch = torch.stack(fea_list)
+    num = len(fea_list)
+    
+    rand_idx = torch.randperm(num)[:K]
+    center_ids = fea_torch[rand_idx].clone()
+    prev_labels = None
+    labels = torch.zeros(num, dtype=torch.long)
+    
+    for _ in range(1000):
+        distances = torch.cdist(fea_torch, center_ids)
+        labels = torch.argmin(distances, dim = 1)
+        if prev_labels != None and torch.equal(labels, prev_labels):
+            break
+        prev_labels = labels.clone()
         
+        for i in range(K):
+            samples = (labels == i)
+            if len(samples):
+                center_ids[i] = fea_torch[samples].mean()
+    
+    for i, name in enumerate(file_names):
+        cluster_results[int(labels[i].item())].append(name)
     
     return cluster_results
 
