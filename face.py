@@ -107,15 +107,15 @@ def cluster_faces(imgs: Dict[str, torch.Tensor], K: int) -> List[List[str]]:
     
     for _ in range(1000):
         distances = torch.cdist(fea_torch, center_ids)
-        labels = torch.argmin(distances, dim = 1)
+        labels = torch.argmin(distances, dim=1)
         if prev_labels != None and torch.equal(labels, prev_labels):
             break
         prev_labels = labels.clone()
         
         for i in range(K):
             samples = (labels == i)
-            if len(samples):
-                center_ids[i] = fea_torch[samples].mean()
+            if samples.sum() > 0:
+                center_ids[i] = fea_torch[samples].mean(dim=0)
     
     for i, name in enumerate(file_names):
         cluster_results[int(labels[i].item())].append(name)
